@@ -574,6 +574,67 @@ body{
 }
 .task-tab-content{display:none}
 .task-tab-content.active{display:block}
+
+/* === ZOOM REQUEST === */
+.zoom-req-btn{
+  width:32px;height:32px;border-radius:8px;
+  border:1.5px solid var(--wire-light);
+  background:#fff;
+  display:grid;place-items:center;
+  font-size:16px;cursor:pointer;
+  transition:all .15s;
+}
+.zoom-req-btn:hover{border-color:var(--accent);background:rgba(61,90,241,.04)}
+
+.zoom-modal-overlay{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.4);
+  z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.zoom-modal{
+  width:100%;
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding:24px 20px 32px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.12);
+}
+.zoom-toast{
+  position:absolute;top:60px;left:20px;right:20px;
+  background:var(--ink);color:#fff;
+  padding:12px 16px;border-radius:10px;
+  font-size:12px;font-weight:500;
+  z-index:60;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+
+/* === NOTIFICATION (멘토) === */
+.noti-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--red);color:#fff;
+  font-size:9px;font-weight:700;
+  display:grid;place-items:center;
+}
+.noti-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;
+  width:320px;
+  background:#fff;
+  border:1px solid var(--wire-light);
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);
+  z-index:200;
+  overflow:hidden;
+}
+.noti-item{
+  padding:12px 16px;
+  border-bottom:1px solid var(--wire-light);
+  transition:background .15s;
+}
+.noti-item:last-child{border-bottom:none}
+.noti-item:hover{background:var(--paper)}
+.noti-item.noti-unread{background:rgba(61,90,241,.03)}
 </style>
 </head>
 <body>
@@ -628,12 +689,13 @@ body{
 <div class="screen" id="m-planner">
   <div class="screen-label">멘티 — /mentee/planner <span class="role-badge mentee">모바일</span></div>
   <div class="mobile-frame">
-    <!-- Date Nav -->
+    <!-- Date Nav + Zoom 신청 -->
     <div class="date-nav">
       <button>&lt;</button>
       <span>2025.01.27 월</span>
       <button>&gt;</button>
       <span style="margin-left:8px;font-size:11px;color:var(--wire);cursor:pointer">📅 월간</span>
+      <button class="zoom-req-btn" onclick="document.getElementById('zoom-modal').style.display='flex'" style="margin-left:auto" title="Zoom 미팅 신청">📹</button>
     </div>
     <!-- Cal Strip: 주간 할 일 요약 뷰 -->
     <div class="cal-strip">
@@ -724,6 +786,31 @@ body{
           <div class="fb-summary">관계대명사 절 해석이 많이 나아졌습니다. 분사구문 파트 추가 연습 필요.</div>
         </div>
       </div>
+    </div>
+
+    <!-- Zoom 미팅 신청 모달 (바텀시트) -->
+    <div class="zoom-modal-overlay" id="zoom-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+      <div class="zoom-modal">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h3 style="font-size:15px;font-weight:700">📹 Zoom 미팅 신청</h3>
+          <button style="border:none;background:transparent;font-size:18px;color:var(--wire-dark);cursor:pointer" onclick="document.getElementById('zoom-modal').style.display='none'">✕</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">희망 날짜</label>
+          <input class="w-input" type="date" value="2025-01-29" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">희망 시간</label>
+          <input class="w-input" type="time" value="20:00" />
+        </div>
+        <button class="w-btn primary" style="width:100%;padding:12px;margin-top:8px" onclick="document.getElementById('zoom-modal').style.display='none';document.getElementById('zoom-toast').style.display='flex';setTimeout(()=>document.getElementById('zoom-toast').style.display='none',3000)">신청하기</button>
+        <div style="font-size:10px;color:var(--wire);text-align:center;margin-top:8px">멘토에게 미팅 신청이 전달됩니다</div>
+      </div>
+    </div>
+
+    <!-- Zoom 신청 완료 Toast -->
+    <div class="zoom-toast" id="zoom-toast" style="display:none">
+      ✅ Zoom 미팅 신청이 완료되었습니다
     </div>
 
     <!-- Bottom Nav -->
@@ -973,7 +1060,36 @@ body{
             <h1>담당 멘티</h1>
             <p style="font-size:12px;color:var(--wire-dark);margin-top:2px">총 2명의 멘티를 관리하고 있습니다</p>
           </div>
-          <div style="font-size:13px;color:var(--wire-dark)">2025.01.27 월</div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="font-size:13px;color:var(--wire-dark)">2025.01.27 월</div>
+            <!-- 알림 아이콘 -->
+            <div class="noti-bell" onclick="document.getElementById('noti-dropdown').style.display=document.getElementById('noti-dropdown').style.display==='block'?'none':'block'" style="position:relative;cursor:pointer">
+              <span style="font-size:20px">🔔</span>
+              <span class="noti-badge">1</span>
+              <!-- 알림 드롭다운 -->
+              <div class="noti-dropdown" id="noti-dropdown" style="display:none">
+                <div style="font-size:12px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--wire-light)">알림</div>
+                <div class="noti-item noti-unread">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <span style="font-size:14px">📹</span>
+                    <span style="font-size:12px;font-weight:600">Zoom 미팅 신청</span>
+                    <span class="task-badge" style="background:rgba(240,180,41,.15);color:#b8860b">대기중</span>
+                  </div>
+                  <div style="font-size:12px;color:var(--wire-dark)">민유진 — 1/29(수) 20:00</div>
+                  <div style="margin-top:8px;display:flex;gap:6px">
+                    <button class="w-btn primary" style="padding:4px 14px;font-size:11px">확인</button>
+                  </div>
+                </div>
+                <div class="noti-item">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <span style="font-size:14px">✅</span>
+                    <span style="font-size:12px;font-weight:600">플래너 마감</span>
+                  </div>
+                  <div style="font-size:12px;color:var(--wire-dark)">민유진 — 1/27(목) 22:15 마감 완료</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="student-card">
