@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설스터디 MVP 와이어프레임</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#1a1a2e;
+  --paper:#f4f3ef;
+  --wire:#b0aead;
+  --wire-light:#d9d8d5;
+  --wire-dark:#7a7978;
+  --accent:#3d5af1;
+  --red:#e8453c;
+  --blue:#3d7df1;
+  --green:#2daa6e;
+  --yellow:#f0b429;
+  --bg-screen:#fafaf8;
+  --radius:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+
+body{
+  font-family:'Noto Sans KR','Outfit',sans-serif;
+  background:#e8e7e3;
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* === TOP NAV === */
+.top-bar{
+  position:sticky;top:0;z-index:100;
+  background:var(--ink);
+  color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:52px;
+  font-size:13px;
+  box-shadow:0 2px 12px rgba(0,0,0,.2);
+}
+.top-bar .logo{
+  font-family:'Outfit';font-weight:700;font-size:16px;
+  letter-spacing:-.5px;
+  display:flex;align-items:center;gap:8px;
+}
+.top-bar .logo span{
+  background:var(--accent);
+  width:24px;height:24px;border-radius:6px;
+  display:grid;place-items:center;
+  font-size:12px;font-weight:700;
+}
+.tab-group{
+  display:flex;gap:2px;
+  background:rgba(255,255,255,.08);
+  border-radius:8px;padding:3px;
+}
+.tab-group button{
+  border:none;background:transparent;
+  color:rgba(255,255,255,.5);
+  padding:6px 14px;border-radius:6px;
+  font-size:12px;font-weight:500;cursor:pointer;
+  font-family:inherit;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.tab-group button:hover{color:rgba(255,255,255,.8)}
+.tab-group button.active{
+  background:rgba(255,255,255,.15);
+  color:#fff;
+}
+.role-badge{
+  font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.role-badge.mentee{background:var(--green);color:#fff}
+.role-badge.mentor{background:var(--accent);color:#fff}
+
+/* === CANVAS === */
+.canvas{
+  display:flex;justify-content:center;
+  padding:32px 24px 60px;
+  min-height:calc(100vh - 52px);
+}
+.screen{display:none}
+.screen.active{display:block}
+
+/* === MOBILE FRAME === */
+.mobile-frame{
+  width:375px;
+  min-height:720px;
+  background:var(--bg-screen);
+  border-radius:28px;
+  box-shadow:0 8px 40px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+  overflow:hidden;
+  position:relative;
+}
+.mobile-frame::before{
+  content:'';display:block;
+  width:120px;height:5px;
+  background:var(--wire-light);
+  border-radius:3px;
+  margin:10px auto 0;
+}
+
+/* === PC FRAME === */
+.pc-frame{
+  width:1080px;max-width:100%;
+  min-height:640px;
+  background:var(--bg-screen);
+  border-radius:12px;
+  box-shadow:0 8px 40px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+
+/* === WIRE COMPONENTS === */
+.w-header{
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--wire-light);
+  background:#fff;
+}
+.w-header h2{font-size:15px;font-weight:600}
+.w-back{
+  width:28px;height:28px;border-radius:8px;
+  border:1.5px solid var(--wire);
+  display:grid;place-items:center;
+  font-size:14px;color:var(--wire-dark);cursor:pointer;
+  background:transparent;
+}
+
+.w-section{padding:16px 20px}
+.w-section-title{
+  font-size:12px;font-weight:600;
+  color:var(--wire-dark);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.w-section-title::before{
+  content:'';width:3px;height:12px;
+  background:var(--accent);border-radius:2px;
+}
+
+.w-card{
+  background:#fff;
+  border:1px solid var(--wire-light);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  margin-bottom:8px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:border-color .2s;
+}
+.w-card:hover{border-color:var(--accent)}
+
+.w-tag{
+  display:inline-block;
+  font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:4px;
+  letter-spacing:.3px;
+}
+.w-tag.kor{background:#fde8e8;color:var(--red)}
+.w-tag.eng{background:#e3edfd;color:var(--blue)}
+.w-tag.math{background:#e1f5ec;color:var(--green)}
+
+.w-checkbox{
+  width:18px;height:18px;border-radius:5px;
+  border:2px solid var(--wire);
+  display:inline-grid;place-items:center;
+  font-size:11px;color:var(--accent);flex-shrink:0;
+}
+.w-checkbox.checked{
+  background:var(--accent);border-color:var(--accent);
+  color:#fff;
+}
+
+.w-input{
+  width:100%;
+  border:1.5px solid var(--wire-light);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:13px;
+  color:var(--wire-dark);
+  background:var(--paper);
+  font-family:inherit;
+}
+.w-input::placeholder{color:var(--wire)}
+
+.w-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 20px;
+  border-radius:8px;
+  font-size:13px;font-weight:600;
+  border:none;cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+.w-btn.primary{background:var(--accent);color:#fff}
+.w-btn.primary:hover{background:#2d4ad1}
+.w-btn.outline{background:transparent;border:1.5px solid var(--wire);color:var(--ink)}
+
+.w-placeholder{
+  background:var(--paper);
+  border:1.5px dashed var(--wire);
+  border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--wire-dark);font-size:12px;
+  min-height:60px;
+}
+
+/* === BOTTOM NAV === */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  height:56px;
+  background:#fff;
+  border-top:1px solid var(--wire-light);
+  display:flex;
+  box-shadow:0 -2px 10px rgba(0,0,0,.04);
+}
+.bottom-nav button{
+  flex:1;border:none;background:transparent;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  font-size:10px;font-weight:500;
+  color:var(--wire);cursor:pointer;font-family:inherit;
+}
+.bottom-nav button.active{color:var(--accent)}
+.bottom-nav button .ico{font-size:18px}
+
+/* === CALENDAR STRIP === */
+.cal-strip{
+  display:flex;gap:4px;padding:12px 20px;
+  background:#fff;
+  border-bottom:1px solid var(--wire-light);
+}
+.cal-day{
+  flex:1;text-align:center;padding:6px 0;
+  border-radius:10px;cursor:pointer;
+  transition:all .15s;
+}
+.cal-day .day-label{font-size:10px;color:var(--wire);font-weight:500}
+.cal-day .day-num{font-size:15px;font-weight:600;margin-top:2px;color:var(--ink)}
+.cal-day.today{background:var(--accent);border-radius:10px}
+.cal-day.today .day-label,.cal-day.today .day-num{color:#fff}
+
+/* === DATE NAV === */
+.date-nav{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:12px 20px;
+  background:#fff;
+  font-size:14px;font-weight:600;
+}
+.date-nav button{
+  border:none;background:transparent;
+  font-size:16px;cursor:pointer;color:var(--wire-dark);
+}
+
+/* === TASK ROW === */
+.task-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid var(--wire-light);
+}
+.task-row:last-child{border-bottom:none}
+.task-info{flex:1;min-width:0}
+.task-name{font-size:13px;font-weight:500}
+.task-meta{font-size:11px;color:var(--wire-dark);margin-top:2px;display:flex;align-items:center;gap:6px}
+.task-time{
+  font-size:12px;font-weight:600;
+  color:var(--accent);
+  background:rgba(61,90,241,.08);
+  padding:3px 8px;border-radius:6px;
+  white-space:nowrap;
+}
+
+/* === FEEDBACK CARD === */
+.fb-card{
+  background:#fff;
+  border-left:3px solid var(--accent);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:12px 14px;
+  margin-bottom:8px;
+  box-shadow:var(--shadow);
+}
+.fb-card .fb-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.fb-card .fb-summary{font-size:12px;color:var(--wire-dark);line-height:1.5}
+.fb-card .fb-important{
+  margin-top:6px;padding:6px 10px;
+  background:rgba(240,180,41,.1);
+  border-radius:6px;
+  font-size:11px;font-weight:500;
+  color:#b8860b;
+}
+
+/* === PC SIDEBAR === */
+.pc-layout{display:flex;height:100%}
+.pc-sidebar{
+  width:240px;flex-shrink:0;
+  background:#fff;
+  border-right:1px solid var(--wire-light);
+  padding:20px 0;
+}
+.pc-sidebar .nav-item{
+  padding:10px 24px;
+  font-size:13px;font-weight:500;
+  color:var(--wire-dark);
+  cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  transition:all .15s;
+}
+.pc-sidebar .nav-item:hover{background:var(--paper)}
+.pc-sidebar .nav-item.active{
+  color:var(--accent);
+  background:rgba(61,90,241,.06);
+  border-right:3px solid var(--accent);
+}
+.pc-sidebar .nav-item .ico{font-size:16px;width:20px;text-align:center}
+.pc-main{flex:1;padding:24px 28px;overflow-y:auto;max-height:640px}
+
+/* === TABLE === */
+.w-table{width:100%;border-collapse:collapse;font-size:13px}
+.w-table th{
+  text-align:left;padding:10px 12px;
+  font-weight:600;font-size:11px;
+  color:var(--wire-dark);
+  text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:2px solid var(--wire-light);
+  background:var(--paper);
+}
+.w-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--wire-light);
+  vertical-align:middle;
+}
+.w-table tr:hover td{background:rgba(61,90,241,.02)}
+
+/* === TWO PANEL === */
+.two-panel{display:flex;gap:20px}
+.panel{flex:1;min-width:0}
+.panel-header{
+  font-size:14px;font-weight:600;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--ink);
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* === UPLOAD AREA === */
+.upload-area{
+  border:2px dashed var(--wire);
+  border-radius:var(--radius);
+  padding:24px;
+  text-align:center;
+  color:var(--wire-dark);
+  font-size:12px;
+  cursor:pointer;
+  transition:border-color .2s;
+}
+.upload-area:hover{border-color:var(--accent)}
+.upload-area .ico{font-size:28px;margin-bottom:8px;display:block}
+
+/* === ANNOTATION === */
+.anno{
+  position:relative;
+  display:inline-flex;
+  align-items:center;gap:4px;
+}
+.anno::after{
+  content:attr(data-note);
+  position:absolute;
+  bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;
+  font-size:9px;padding:3px 8px;border-radius:4px;
+  white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s;
+}
+.anno:hover::after{opacity:1}
+
+/* === SCREEN LABEL === */
+.screen-label{
+  text-align:center;
+  padding:12px;
+  font-size:11px;
+  font-weight:600;
+  color:var(--wire-dark);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+/* Progress bar */
+.progress-bar{
+  height:6px;background:var(--paper);border-radius:3px;overflow:hidden;
+}
+.progress-fill{height:100%;border-radius:3px}
+
+/* Student card (mentor) */
+.student-card{
+  background:#fff;
+  border:1px solid var(--wire-light);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;align-items:center;gap:16px;
+}
+.student-card:hover{
+  border-color:var(--accent);
+  box-shadow:0 4px 16px rgba(61,90,241,.12);
+  transform:translateY(-1px);
+}
+.student-avatar{
+  width:48px;height:48px;border-radius:14px;
+  background:var(--paper);border:2px solid var(--wire-light);
+  display:grid;place-items:center;
+  font-size:20px;flex-shrink:0;
+}
+.student-stats{
+  display:flex;gap:16px;margin-top:8px;
+}
+.stat-item{font-size:11px;color:var(--wire-dark)}
+.stat-item strong{color:var(--ink);font-weight:600}
+
+/* Form group */
+.form-group{margin-bottom:16px}
+.form-label{
+  display:block;font-size:12px;font-weight:600;
+  color:var(--wire-dark);margin-bottom:6px;
+}
+
+/* Solution row */
+.sol-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--wire-light);
+}
+
+/* Scroll area for mobile */
+.scroll-area{
+  padding-bottom:70px;
+  overflow-y:auto;
+}
+
+/* Login */
+.login-container{
+  width:400px;
+  background:var(--bg-screen);
+  border-radius:20px;
+  box-shadow:0 8px 40px rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.login-hero{
+  background:var(--ink);
+  padding:48px 40px 36px;
+  text-align:center;
+  color:#fff;
+}
+.login-hero .logo-big{
+  font-family:'Outfit';font-size:28px;font-weight:700;
+  letter-spacing:-1px;
+  margin-bottom:8px;
+}
+.login-hero .logo-big span{
+  color:var(--accent);
+}
+.login-hero p{font-size:13px;color:rgba(255,255,255,.5)}
+.login-form{padding:32px 40px 40px}
+.login-form .form-group{margin-bottom:20px}
+.login-form .w-input{
+  padding:14px 16px;
+  font-size:14px;
+  background:#fff;
+  border-color:var(--wire-light);
+}
+.login-form .w-btn{
+  width:100%;padding:14px;font-size:14px;
+}
+.login-hint{
+  margin-top:16px;
+  font-size:11px;color:var(--wire);
+  text-align:center;line-height:1.6;
+}
+
+/* Mentor header bar */
+.mentor-topbar{
+  padding:16px 28px;
+  background:#fff;
+  border-bottom:1px solid var(--wire-light);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.mentor-topbar h1{font-size:18px;font-weight:700}
+
+/* floating button */
+.fab{
+  position:absolute;bottom:70px;right:20px;
+  width:48px;height:48px;border-radius:14px;
+  background:var(--accent);color:#fff;
+  display:grid;place-items:center;
+  font-size:22px;box-shadow:0 4px 16px rgba(61,90,241,.3);
+  cursor:pointer;border:none;
+}
+
+/* resource card */
+.res-card{
+  background:#fff;border:1px solid var(--wire-light);
+  border-radius:var(--radius);
+  padding:16px;margin-bottom:10px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow);cursor:pointer;
+  transition:border-color .2s;
+}
+.res-card:hover{border-color:var(--accent)}
+.res-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:grid;place-items:center;font-size:18px;flex-shrink:0;
+}
+
+/* annotation dot */
+.dot{
+  width:8px;height:8px;border-radius:50%;display:inline-block;
+}
+.dot.red{background:var(--red)}
+.dot.blue{background:var(--blue)}
+.dot.green{background:var(--green)}
+
+/* === TASK BADGES (멘토/멘티 과제 구분, 업로드 정책) === */
+.task-badge{
+  display:inline-block;
+  font-size:9px;font-weight:600;
+  padding:1px 6px;border-radius:3px;
+  vertical-align:middle;
+  letter-spacing:.2px;
+}
+.task-badge.mentor-task{background:rgba(61,90,241,.12);color:var(--accent)}
+.task-badge.mentee-task{background:rgba(45,170,110,.12);color:var(--green)}
+.task-badge.upload-req{background:rgba(232,69,60,.1);color:var(--red)}
+
+/* === DAY TASKS (주간 할 일 요약 뷰) === */
+.day-tasks{
+  font-size:9px;font-weight:600;
+  color:var(--accent);
+  margin-top:2px;
+}
+
+/* === TASK DETAIL TABS === */
+.task-tab-group{
+  display:flex;gap:0;
+  border-bottom:2px solid var(--wire-light);
+}
+.task-tab{
+  flex:1;
+  border:none;background:transparent;
+  padding:10px 0;
+  font-size:13px;font-weight:600;
+  color:var(--wire);
+  cursor:pointer;
+  font-family:inherit;
+  text-align:center;
+  transition:all .2s;
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+}
+.task-tab.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+}
+.task-tab-content{display:none}
+.task-tab-content.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo">
+    <span>S</span> 설스터디 와이어프레임
+  </div>
+  <div class="tab-group" id="tabGroup">
+    <button class="active" onclick="show('login')">로그인</button>
+    <button onclick="show('m-planner')">멘티:플래너</button>
+    <button onclick="show('m-task')">멘티:과제상세</button>
+    <button onclick="show('m-feedback')">멘티:피드백</button>
+    <button onclick="show('m-resources')">멘티:학습자료</button>
+    <button onclick="show('p-students')">멘토:멘티목록</button>
+    <button onclick="show('p-detail')">멘토:상세관리</button>
+    <button onclick="show('p-newtask')">멘토:할일등록</button>
+    <button onclick="show('p-solutions')">멘토:솔루션</button>
+  </div>
+</div>
+
+<div class="canvas">
+
+<!-- ===== LOGIN ===== -->
+<div class="screen active" id="login">
+  <div class="screen-label">공통 — /login</div>
+  <div class="login-container">
+    <div class="login-hero">
+      <div class="logo-big">설<span>스터디</span></div>
+      <p>자체 콘텐츠 기반 수능 국영수 학습코칭</p>
+    </div>
+    <div class="login-form">
+      <div class="form-group">
+        <label class="form-label">아이디</label>
+        <input class="w-input" placeholder="test_mentee1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="w-input" type="password" placeholder="••••••••" />
+      </div>
+      <button class="w-btn primary" style="width:100%;padding:14px;font-size:14px">로그인</button>
+      <div class="login-hint">
+        테스트 계정<br>
+        멘토: mentor01 / 멘티: mentee01, mentee02
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTEE: PLANNER ===== -->
+<div class="screen" id="m-planner">
+  <div class="screen-label">멘티 — /mentee/planner <span class="role-badge mentee">모바일</span></div>
+  <div class="mobile-frame">
+    <!-- Date Nav -->
+    <div class="date-nav">
+      <button>&lt;</button>
+      <span>2025.01.27 월</span>
+      <button>&gt;</button>
+      <span style="margin-left:8px;font-size:11px;color:var(--wire);cursor:pointer">📅 월간</span>
+    </div>
+    <!-- Cal Strip: 주간 할 일 요약 뷰 -->
+    <div class="cal-strip">
+      <div class="cal-day"><div class="day-label">월</div><div class="day-num">24</div><div class="day-tasks">3/3 ✓</div></div>
+      <div class="cal-day"><div class="day-label">화</div><div class="day-num">25</div><div class="day-tasks">2/3</div></div>
+      <div class="cal-day"><div class="day-label">수</div><div class="day-num">26</div><div class="day-tasks">3/3 ✓</div></div>
+      <div class="cal-day today"><div class="day-label">목</div><div class="day-num">27</div><div class="day-tasks" style="color:#fff;opacity:.8">1/3</div></div>
+      <div class="cal-day"><div class="day-label">금</div><div class="day-num">28</div><div class="day-tasks">0/2</div></div>
+      <div class="cal-day"><div class="day-label">토</div><div class="day-num">29</div><div class="day-tasks" style="color:var(--wire)">—</div></div>
+      <div class="cal-day"><div class="day-label">일</div><div class="day-num">30</div><div class="day-tasks" style="color:var(--wire)">—</div></div>
+    </div>
+
+    <div class="scroll-area" style="height:calc(100% - 160px);overflow-y:auto">
+      <!-- Comment: 다목적 사용 (각오, 질문, 회고 등) -->
+      <div class="w-section" style="padding-bottom:8px">
+        <input class="w-input" placeholder="오늘의 각오, 멘토에게 질문, 회고 등을 남겨보세요..." style="font-size:12px" />
+      </div>
+
+      <!-- 오늘 할 일 -->
+      <div class="w-section">
+        <div class="w-section-title">오늘 할 일</div>
+        <div class="w-card">
+          <!-- 멘토 생성 과제: 수정/삭제 불가, 업로드 필수 -->
+          <div class="task-row">
+            <div class="w-checkbox checked">✓</div>
+            <div class="task-info">
+              <div class="task-name">비문학 지문 분석 3지문 <span class="task-badge mentor-task">멘토</span> <span class="task-badge upload-req">업로드 필수</span></div>
+              <div class="task-meta"><span class="w-tag kor">국어</span> 독해력 강화</div>
+            </div>
+            <div class="task-time">14:00~15:20</div>
+          </div>
+          <div class="task-row">
+            <div class="w-checkbox checked">✓</div>
+            <div class="task-info">
+              <div class="task-name">영어 구문 분석 Day 12 <span class="task-badge mentor-task">멘토</span> <span class="task-badge upload-req">업로드 필수</span></div>
+              <div class="task-meta"><span class="w-tag eng">영어</span> 구문 독해</div>
+            </div>
+            <div class="task-time">15:30~16:15</div>
+          </div>
+          <div class="task-row">
+            <div class="w-checkbox"></div>
+            <div class="task-info">
+              <div class="task-name">수학 미적분 유형 풀이 <span class="task-badge mentor-task">멘토</span> <span class="task-badge upload-req">업로드 필수</span></div>
+              <div class="task-meta"><span class="w-tag math">수학</span> 미적분 보완</div>
+            </div>
+            <div class="task-time" style="color:var(--wire);background:var(--paper)">—</div>
+          </div>
+          <!-- 멘티 생성 과제: 업로드 선택 -->
+          <div class="task-row">
+            <div class="w-checkbox checked">✓</div>
+            <div class="task-info">
+              <div class="task-name">영어 단어 암기 50개 <span class="task-badge mentee-task">내가 추가</span></div>
+              <div class="task-meta"><span class="w-tag eng">영어</span></div>
+            </div>
+            <div class="task-time">13:00~13:40</div>
+          </div>
+          <div class="task-row" style="border-bottom:none">
+            <div class="w-checkbox"></div>
+            <div class="task-info">
+              <div class="task-name" style="color:var(--wire-dark)">+ 할 일 추가</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 플래너 마감/피드백 요청 버튼 (수동 완료 방식) -->
+      <div class="w-section" style="padding-top:0;padding-bottom:8px">
+        <button class="w-btn primary" style="width:100%;padding:12px;font-size:13px;border-radius:10px">플래너 마감 / 피드백 요청</button>
+        <div style="text-align:center;font-size:10px;color:var(--wire);margin-top:6px">모든 할 일을 마친 후 눌러주세요. 멘토에게 피드백 요청이 전달됩니다.</div>
+      </div>
+
+      <!-- 어제자 피드백 -->
+      <div class="w-section">
+        <div class="w-section-title">어제자 피드백 보기</div>
+        <div class="fb-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span class="w-tag kor">국어</span>
+            <span class="fb-title">비문학 지문 분석 3지문</span>
+          </div>
+          <div class="fb-summary">지문 구조 파악은 잘 되고 있습니다. 다만 선지 분석에서 근거 매칭이 부족해요.</div>
+          <div class="fb-important">⭐ 핵심: 선지별 근거 문장 번호를 반드시 표기하세요</div>
+        </div>
+        <div class="fb-card" style="border-left-color:var(--blue)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span class="w-tag eng">영어</span>
+            <span class="fb-title">영어 구문 분석 Day 11</span>
+          </div>
+          <div class="fb-summary">관계대명사 절 해석이 많이 나아졌습니다. 분사구문 파트 추가 연습 필요.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <button class="active"><span class="ico">📋</span>플래너</button>
+      <button><span class="ico">📚</span>학습자료</button>
+      <button><span class="ico">👤</span>마이</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTEE: TASK DETAIL ===== -->
+<div class="screen" id="m-task">
+  <div class="screen-label">멘티 — /mentee/task/:id <span class="role-badge mentee">모바일</span></div>
+  <div class="mobile-frame">
+    <div class="w-header">
+      <button class="w-back">&lt;</button>
+      <h2>과제 상세</h2>
+      <div></div>
+    </div>
+
+    <div class="scroll-area" style="height:calc(100% - 56px);overflow-y:auto;padding-bottom:20px">
+      <!-- 과제 정보 -->
+      <div class="w-section">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span class="w-tag kor">국어</span>
+          <span class="task-badge mentor-task">멘토 과제</span>
+          <span class="task-badge upload-req">업로드 필수</span>
+          <span style="font-size:11px;color:var(--wire-dark)">2025.01.27</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">비문학 지문 분석 3지문</h3>
+        <p style="font-size:12px;color:var(--wire-dark)">목표: 독해력 강화 — 선지 근거 매칭 훈련</p>
+      </div>
+
+      <!-- 탭 형태 UI: 학습지 / 제출 -->
+      <div class="w-section" style="padding-bottom:0">
+        <div class="task-tab-group">
+          <button class="task-tab active" onclick="switchTaskTab(this, 'tab-material')">학습지</button>
+          <button class="task-tab" onclick="switchTaskTab(this, 'tab-submit')">제출</button>
+        </div>
+      </div>
+
+      <!-- [학습지] 탭 -->
+      <div class="task-tab-content active" id="tab-material">
+        <div class="w-section">
+          <div class="w-card" style="display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--paper);display:grid;place-items:center;font-size:16px">📄</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">국어_비문학분석_Day27.pdf</div>
+              <div style="font-size:11px;color:var(--wire)">324KB</div>
+            </div>
+            <button class="w-btn outline" style="padding:6px 12px;font-size:11px">다운로드</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- [제출] 탭 -->
+      <div class="task-tab-content" id="tab-submit">
+        <div class="w-section">
+          <div class="w-section-title">공부 인증 사진</div>
+          <div class="upload-area">
+            <span class="ico">📷</span>
+            카메라로 촬영하거나 갤러리에서 선택하세요<br>
+            <span style="font-size:10px;color:var(--wire)">(JPG, 최대 10MB)</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <div style="width:72px;height:72px;border-radius:8px;background:var(--paper);border:1px solid var(--wire-light);display:grid;place-items:center;font-size:10px;color:var(--wire)">미리보기</div>
+            <div style="width:72px;height:72px;border-radius:8px;background:var(--paper);border:1px solid var(--wire-light);display:grid;place-items:center;font-size:10px;color:var(--wire)">미리보기</div>
+          </div>
+          <div style="margin-top:12px;padding:8px 12px;background:rgba(232,69,60,.06);border-radius:8px;font-size:11px;color:var(--red);font-weight:500">
+            * 멘토 생성 과제입니다. 인증 사진 업로드가 필수입니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="w-section">
+        <div class="w-section-title">멘토 확인</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+          <div class="w-checkbox">　</div>
+          <span style="color:var(--wire-dark)">아직 확인 전</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTEE: FEEDBACK ===== -->
+<div class="screen" id="m-feedback">
+  <div class="screen-label">멘티 — /mentee/feedback/:date <span class="role-badge mentee">모바일</span></div>
+  <div class="mobile-frame">
+    <div class="w-header">
+      <button class="w-back">&lt;</button>
+      <h2>피드백 확인</h2>
+      <div></div>
+    </div>
+
+    <div class="date-nav" style="border-bottom:1px solid var(--wire-light)">
+      <button>&lt;</button>
+      <span>2025.01.26 일</span>
+      <button>&gt;</button>
+    </div>
+
+    <div class="scroll-area" style="height:calc(100% - 104px);overflow-y:auto;padding-bottom:20px">
+      <div class="w-section">
+        <div class="w-section-title">과목별 피드백</div>
+
+        <!-- 국어 -->
+        <div class="fb-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="w-tag kor">국어</span>
+            <span class="fb-title">비문학 지문 분석 3지문</span>
+          </div>
+          <div class="fb-important">⭐ 요약: 선지별 근거 문장 번호를 반드시 표기할 것</div>
+          <div class="fb-summary" style="margin-top:8px">
+            지문의 주제 파악과 구조 분석은 점점 나아지고 있습니다. 하지만 선지 분석에서 본문 근거와의 매칭이 부족합니다. 각 선지마다 해당 근거가 되는 문장 번호를 적는 습관을 들이세요. 오답률이 높은 '적절하지 않은 것' 유형에서 소거법을 활용해보세요.
+          </div>
+        </div>
+
+        <!-- 영어 -->
+        <div class="fb-card" style="border-left-color:var(--blue)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="w-tag eng">영어</span>
+            <span class="fb-title">영어 구문 분석 Day 11</span>
+          </div>
+          <div class="fb-summary">
+            관계대명사 절 해석이 많이 나아졌습니다. 특히 which와 that 구분이 정확해졌어요. 다음 단계로 분사구문 파트 추가 연습이 필요합니다. 내일 학습지에 분사구문 집중 문제를 추가해둘게요.
+          </div>
+        </div>
+
+        <!-- 수학 -->
+        <div class="fb-card" style="border-left-color:var(--green)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="w-tag math">수학</span>
+            <span class="fb-title">수학 확률과 통계 유형 풀이</span>
+          </div>
+          <div class="fb-important">⭐ 요약: 조건부확률 공식 암기 → 실전 적용 연습</div>
+          <div class="fb-summary" style="margin-top:8px">
+            기본 확률 문제는 안정적입니다. 조건부확률에서 P(A|B)와 P(A∩B) 혼동이 있으니 공식을 다시 정리하고 유형별 3문제씩 풀어보세요.
+          </div>
+        </div>
+      </div>
+
+      <div class="w-section">
+        <div class="w-section-title">총평</div>
+        <div class="w-card" style="background:var(--paper);border:none">
+          <p style="font-size:13px;line-height:1.7">
+            오늘 전체적으로 학습 시간이 잘 확보되었고, 국어와 영어 모두 꾸준한 성장이 보입니다. 수학은 조건부확률 파트에 집중해서 이번 주 안에 마무리합시다. 내일은 영어 분사구문 학습지가 추가됩니다 💪
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTEE: RESOURCES ===== -->
+<div class="screen" id="m-resources">
+  <div class="screen-label">멘티 — /mentee/resources <span class="role-badge mentee">모바일</span></div>
+  <div class="mobile-frame">
+    <div class="w-header">
+      <div></div>
+      <h2>학습자료</h2>
+      <div></div>
+    </div>
+
+    <div class="scroll-area" style="height:calc(100% - 100px);overflow-y:auto">
+      <div class="w-section">
+        <div class="w-section-title">바로가기</div>
+        <div class="res-card">
+          <div class="res-icon" style="background:rgba(61,90,241,.08)">📅</div>
+          <div>
+            <div style="font-size:14px;font-weight:600">월간계획표</div>
+            <div style="font-size:11px;color:var(--wire-dark)">1월 학습 일정 확인</div>
+          </div>
+        </div>
+        <div class="res-card">
+          <div class="res-icon" style="background:rgba(45,170,110,.08)">📝</div>
+          <div>
+            <div style="font-size:14px;font-weight:600">서울대쌤 칼럼</div>
+            <div style="font-size:11px;color:var(--wire-dark)">공부법 칼럼 모아보기</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-section">
+        <div class="w-section-title">약점 맞춤 솔루션</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <button class="w-btn primary" style="padding:6px 14px;font-size:11px;border-radius:20px">전체</button>
+          <button class="w-btn outline" style="padding:6px 14px;font-size:11px;border-radius:20px">국어</button>
+          <button class="w-btn outline" style="padding:6px 14px;font-size:11px;border-radius:20px">영어</button>
+          <button class="w-btn outline" style="padding:6px 14px;font-size:11px;border-radius:20px">수학</button>
+        </div>
+        <div class="w-card">
+          <div class="sol-row" style="padding-top:0">
+            <span class="w-tag kor">국어</span>
+            <div style="flex:1;font-size:13px;font-weight:500">독해력 강화</div>
+            <span style="font-size:11px;color:var(--accent);cursor:pointer">📎 자료</span>
+          </div>
+          <div class="sol-row">
+            <span class="w-tag kor">국어</span>
+            <div style="flex:1;font-size:13px;font-weight:500">문학 감상법 정리</div>
+            <span style="font-size:11px;color:var(--accent);cursor:pointer">📎 자료</span>
+          </div>
+          <div class="sol-row">
+            <span class="w-tag eng">영어</span>
+            <div style="flex:1;font-size:13px;font-weight:500">구문 독해</div>
+            <span style="font-size:11px;color:var(--accent);cursor:pointer">📎 자료</span>
+          </div>
+          <div class="sol-row">
+            <span class="w-tag math">수학</span>
+            <div style="flex:1;font-size:13px;font-weight:500">미적분 보완</div>
+            <span style="font-size:11px;color:var(--accent);cursor:pointer">📎 자료</span>
+          </div>
+          <div class="sol-row" style="border-bottom:none">
+            <span class="w-tag math">수학</span>
+            <div style="flex:1;font-size:13px;font-weight:500">조건부확률 공식 정리</div>
+            <span style="font-size:11px;color:var(--accent);cursor:pointer">📎 자료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button><span class="ico">📋</span>플래너</button>
+      <button class="active"><span class="ico">📚</span>학습자료</button>
+      <button><span class="ico">👤</span>마이</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTOR: STUDENT LIST ===== -->
+<div class="screen" id="p-students">
+  <div class="screen-label">멘토 — /mentor/students <span class="role-badge mentor">PC 웹</span></div>
+  <div class="pc-frame">
+    <div class="pc-layout">
+      <div class="pc-sidebar">
+        <div style="padding:0 24px 20px;border-bottom:1px solid var(--wire-light);margin-bottom:12px">
+          <div style="font-family:'Outfit';font-size:18px;font-weight:700;letter-spacing:-1px">설<span style="color:var(--accent)">스터디</span></div>
+          <div style="font-size:11px;color:var(--wire);margin-top:2px">멘토 대시보드</div>
+        </div>
+        <div class="nav-item active"><span class="ico">👥</span>담당 멘티</div>
+        <div class="nav-item"><span class="ico">📊</span>학습 현황</div>
+        <div class="nav-item"><span class="ico">⚙️</span>설정</div>
+      </div>
+      <div class="pc-main">
+        <div class="mentor-topbar" style="margin:-24px -28px 24px;padding:20px 28px">
+          <div>
+            <h1>담당 멘티</h1>
+            <p style="font-size:12px;color:var(--wire-dark);margin-top:2px">총 2명의 멘티를 관리하고 있습니다</p>
+          </div>
+          <div style="font-size:13px;color:var(--wire-dark)">2025.01.27 월</div>
+        </div>
+
+        <div class="student-card">
+          <div class="student-avatar">👩‍🎓</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600">민유진</div>
+            <div class="student-stats">
+              <div class="stat-item">오늘 할 일 <strong>3/4</strong></div>
+              <div class="stat-item">확인 대기 <strong style="color:var(--red)">2건</strong></div>
+              <div class="stat-item">플래너 <strong style="color:var(--green)">마감완료</strong></div>
+            </div>
+            <div style="margin-top:8px">
+              <div style="display:flex;gap:4px">
+                <span class="w-tag kor">국어</span>
+                <span class="w-tag eng">영어</span>
+                <span class="w-tag math">수학</span>
+              </div>
+            </div>
+          </div>
+          <div style="color:var(--wire)">&gt;</div>
+        </div>
+
+        <div class="student-card">
+          <div class="student-avatar">👨‍🎓</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600">김태현</div>
+            <div class="student-stats">
+              <div class="stat-item">오늘 할 일 <strong>1/4</strong></div>
+              <div class="stat-item">확인 대기 <strong style="color:var(--red)">3건</strong></div>
+              <div class="stat-item">플래너 <strong style="color:var(--yellow)">미마감</strong></div>
+            </div>
+            <div style="margin-top:8px">
+              <div style="display:flex;gap:4px">
+                <span class="w-tag kor">국어</span>
+                <span class="w-tag eng">영어</span>
+                <span class="w-tag math">수학</span>
+              </div>
+            </div>
+          </div>
+          <div style="color:var(--wire)">&gt;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTOR: STUDENT DETAIL ===== -->
+<div class="screen" id="p-detail">
+  <div class="screen-label">멘토 — /mentor/students/:id <span class="role-badge mentor">PC 웹</span></div>
+  <div class="pc-frame">
+    <div class="pc-layout">
+      <div class="pc-sidebar">
+        <div style="padding:0 24px 20px;border-bottom:1px solid var(--wire-light);margin-bottom:12px">
+          <div style="font-family:'Outfit';font-size:18px;font-weight:700;letter-spacing:-1px">설<span style="color:var(--accent)">스터디</span></div>
+        </div>
+        <div class="nav-item"><span class="ico">👥</span>담당 멘티</div>
+        <div class="nav-item active"><span class="ico">📋</span>민유진</div>
+        <div class="nav-item" style="padding-left:48px;font-size:12px">할 일 관리</div>
+        <div class="nav-item" style="padding-left:48px;font-size:12px">피드백</div>
+        <div class="nav-item" style="padding-left:48px;font-size:12px">솔루션</div>
+      </div>
+      <div class="pc-main">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="w-back">&lt;</button>
+            <h2 style="font-size:18px;font-weight:700">민유진</h2>
+            <div class="date-nav" style="padding:0;gap:10px">
+              <button>&lt;</button>
+              <span style="font-size:13px">2025.01.27 월</span>
+              <button>&gt;</button>
+            </div>
+          </div>
+          <button class="w-btn primary" style="font-size:12px">+ 할 일 등록</button>
+        </div>
+
+        <!-- 플래너 마감 상태 표시 -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:rgba(45,170,110,.08);border:1px solid rgba(45,170,110,.2);border-radius:8px">
+          <span style="font-size:14px">✅</span>
+          <span style="font-size:12px;font-weight:600;color:var(--green)">멘티가 플래너를 마감했습니다</span>
+          <span style="font-size:11px;color:var(--wire-dark);margin-left:auto">마감 시각: 22:15</span>
+        </div>
+
+        <div class="two-panel">
+          <!-- Left: Tasks & Submissions -->
+          <div class="panel">
+            <div class="panel-header">📋 할 일 & 제출 현황</div>
+            <table class="w-table">
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>과목</th>
+                  <th>목표</th>
+                  <th>유형</th>
+                  <th>확인</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500">비문학 지문 분석 3지문</td>
+                  <td><span class="w-tag kor">국어</span></td>
+                  <td style="font-size:12px;color:var(--wire-dark)">독해력 강화</td>
+                  <td><span class="task-badge mentor-task">멘토</span></td>
+                  <td><div class="w-checkbox checked" style="cursor:pointer">✓</div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500">영어 구문 분석 Day 12</td>
+                  <td><span class="w-tag eng">영어</span></td>
+                  <td style="font-size:12px;color:var(--wire-dark)">구문 독해</td>
+                  <td><span class="task-badge mentor-task">멘토</span></td>
+                  <td><div class="w-checkbox" style="cursor:pointer">　</div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500">수학 미적분 유형 풀이</td>
+                  <td><span class="w-tag math">수학</span></td>
+                  <td style="font-size:12px;color:var(--wire-dark)">미적분 보완</td>
+                  <td><span class="task-badge mentor-task">멘토</span></td>
+                  <td><div class="w-checkbox" style="cursor:pointer">　</div></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500">영어 단어 암기 50개</td>
+                  <td><span class="w-tag eng">영어</span></td>
+                  <td style="font-size:12px;color:var(--wire)">—</td>
+                  <td><span class="task-badge mentee-task">멘티</span></td>
+                  <td><div class="w-checkbox checked" style="cursor:pointer">✓</div></td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="margin-top:16px">
+              <div style="font-size:12px;font-weight:600;color:var(--wire-dark);margin-bottom:8px">제출 인증사진</div>
+              <div style="display:flex;gap:8px">
+                <div style="width:100px;height:100px;border-radius:8px;background:var(--paper);border:1px solid var(--wire-light);display:grid;place-items:center;font-size:11px;color:var(--wire)">국어 인증</div>
+                <div style="width:100px;height:100px;border-radius:8px;background:var(--paper);border:1px solid var(--wire-light);display:grid;place-items:center;font-size:11px;color:var(--wire)">영어 인증</div>
+                <div class="w-placeholder" style="width:100px;height:100px;font-size:10px">미제출</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Feedback -->
+          <div class="panel">
+            <div class="panel-header">✍️ 피드백 작성</div>
+            <div class="form-group">
+              <label class="form-label">선택된 할 일: 비문학 지문 분석 3지문</label>
+              <textarea class="w-input" rows="4" placeholder="피드백 내용을 작성하세요..." style="resize:vertical"></textarea>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+                <div class="w-checkbox checked">✓</div>
+                <span>중요 표시 (멘티 요약에 노출)</span>
+              </label>
+            </div>
+            <div style="border-top:1px solid var(--wire-light);padding-top:16px;margin-top:8px">
+              <div class="form-group">
+                <label class="form-label">총평</label>
+                <textarea class="w-input" rows="3" placeholder="오늘 전체 학습에 대한 총평..." style="resize:vertical"></textarea>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button class="w-btn outline">임시저장</button>
+              <button class="w-btn primary">피드백 저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTOR: NEW TASK ===== -->
+<div class="screen" id="p-newtask">
+  <div class="screen-label">멘토 — /mentor/students/:id/tasks/new <span class="role-badge mentor">PC 웹</span></div>
+  <div class="pc-frame">
+    <div class="pc-layout">
+      <div class="pc-sidebar">
+        <div style="padding:0 24px 20px;border-bottom:1px solid var(--wire-light);margin-bottom:12px">
+          <div style="font-family:'Outfit';font-size:18px;font-weight:700;letter-spacing:-1px">설<span style="color:var(--accent)">스터디</span></div>
+        </div>
+        <div class="nav-item"><span class="ico">👥</span>담당 멘티</div>
+        <div class="nav-item active"><span class="ico">📋</span>민유진</div>
+      </div>
+      <div class="pc-main">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+          <button class="w-back">&lt;</button>
+          <h2 style="font-size:18px;font-weight:700">할 일 등록</h2>
+          <span style="font-size:12px;color:var(--wire-dark)">민유진</span>
+        </div>
+
+        <div style="max-width:560px">
+          <div class="form-group">
+            <label class="form-label">날짜</label>
+            <input class="w-input" type="text" value="2025-01-28" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">할 일 이름</label>
+            <input class="w-input" placeholder="예: 비문학 지문 분석 3지문" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">목표 (약점 맞춤 솔루션에서 선택)</label>
+            <select class="w-input" style="cursor:pointer">
+              <option>선택하세요...</option>
+              <option>국어 — 독해력 강화</option>
+              <option>국어 — 문학 감상법 정리</option>
+              <option>영어 — 구문 독해</option>
+              <option>수학 — 미적분 보완</option>
+              <option>수학 — 조건부확률 공식 정리</option>
+            </select>
+            <div style="font-size:11px;color:var(--wire);margin-top:4px">→ 과목은 목표 선택 시 자동 매핑됩니다</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">학습지 업로드</label>
+            <div class="upload-area" style="padding:20px">
+              <span class="ico" style="font-size:22px">📎</span>
+              설스터디 칼럼 또는 PDF 파일을 업로드하세요
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--wire-light)">
+            <button class="w-btn outline">취소</button>
+            <button class="w-btn primary">할 일 등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MENTOR: SOLUTIONS ===== -->
+<div class="screen" id="p-solutions">
+  <div class="screen-label">멘토 — /mentor/students/:id/solutions <span class="role-badge mentor">PC 웹</span></div>
+  <div class="pc-frame">
+    <div class="pc-layout">
+      <div class="pc-sidebar">
+        <div style="padding:0 24px 20px;border-bottom:1px solid var(--wire-light);margin-bottom:12px">
+          <div style="font-family:'Outfit';font-size:18px;font-weight:700;letter-spacing:-1px">설<span style="color:var(--accent)">스터디</span></div>
+        </div>
+        <div class="nav-item"><span class="ico">👥</span>담당 멘티</div>
+        <div class="nav-item active"><span class="ico">📋</span>민유진</div>
+        <div class="nav-item" style="padding-left:48px;font-size:12px">할 일 관리</div>
+        <div class="nav-item" style="padding-left:48px;font-size:12px">피드백</div>
+        <div class="nav-item active" style="padding-left:48px;font-size:12px">솔루션</div>
+      </div>
+      <div class="pc-main">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="w-back">&lt;</button>
+            <h2 style="font-size:18px;font-weight:700">약점 맞춤 솔루션</h2>
+            <span style="font-size:12px;color:var(--wire-dark)">민유진</span>
+          </div>
+          <button class="w-btn primary" style="font-size:12px">+ 솔루션 추가</button>
+        </div>
+
+        <table class="w-table">
+          <thead>
+            <tr>
+              <th>보완점</th>
+              <th>과목</th>
+              <th>추가자료</th>
+              <th style="width:80px">관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:500">독해력 강화</td>
+              <td><span class="w-tag kor">국어</span></td>
+              <td><span style="font-size:12px;color:var(--accent);cursor:pointer">📎 비문학분석_가이드.pdf</span></td>
+              <td><button class="w-btn outline" style="padding:4px 10px;font-size:11px">수정</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">문학 감상법 정리</td>
+              <td><span class="w-tag kor">국어</span></td>
+              <td><span style="font-size:12px;color:var(--accent);cursor:pointer">📎 문학_감상법.pdf</span></td>
+              <td><button class="w-btn outline" style="padding:4px 10px;font-size:11px">수정</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">구문 독해</td>
+              <td><span class="w-tag eng">영어</span></td>
+              <td><span style="font-size:12px;color:var(--accent);cursor:pointer">📎 구문분석_워크시트.pdf</span></td>
+              <td><button class="w-btn outline" style="padding:4px 10px;font-size:11px">수정</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">미적분 보완</td>
+              <td><span class="w-tag math">수학</span></td>
+              <td><span style="font-size:12px;color:var(--accent);cursor:pointer">📎 미적분_유형별.pdf</span></td>
+              <td><button class="w-btn outline" style="padding:4px 10px;font-size:11px">수정</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">조건부확률 공식 정리</td>
+              <td><span class="w-tag math">수학</span></td>
+              <td><span style="font-size:12px;color:var(--wire)">자료 없음</span></td>
+              <td><button class="w-btn outline" style="padding:4px 10px;font-size:11px">수정</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /canvas -->
+
+<script>
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-group button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function switchTaskTab(btn, tabId){
+  btn.closest('.mobile-frame').querySelectorAll('.task-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.mobile-frame').querySelectorAll('.task-tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+</script>
+
+</body>
+</html>
+
+
