@@ -943,7 +943,9 @@ POST /api/v1/mentee/zoom-meetings
 
 ---
 
-### 3.19 Zoom 미팅 신청 내역 조회
+### 3.19 Zoom 미팅 목록 조회 (멘토용)
+
+**멘토가 담당 멘티들의 Zoom 미팅 신청 내역을 조회합니다.**
 
 **Endpoint**
 
@@ -965,6 +967,7 @@ GET /api/v1/mentee/zoom-meetings
     "meetings": [
       {
         "id": 1,
+        "studentName": "민유진",
         "preferredDate": "2025-01-29",
         "preferredTime": "20:00",
         "status": "PENDING",
@@ -973,6 +976,7 @@ GET /api/v1/mentee/zoom-meetings
       },
       {
         "id": 2,
+        "studentName": "김철수",
         "preferredDate": "2025-01-22",
         "preferredTime": "19:00",
         "status": "CONFIRMED",
@@ -983,6 +987,11 @@ GET /api/v1/mentee/zoom-meetings
   }
 }
 ```
+
+**응답 필드 변경사항**
+- `studentName` 필드 추가: 신청한 멘티의 이름
+- 멘토가 호출 시: 담당 멘티들의 Zoom 신청 목록 반환
+- 주로 `status=PENDING`으로 필터링하여 확인 대기 중인 신청만 조회
 
 ---
 
@@ -1577,59 +1586,17 @@ POST /api/v1/mentor/students/{studentId}/monthly-reports
 
 ---
 
-### 4.15 알림 목록 조회
+### 4.15 알림 목록 조회 (미사용)
 
-멘토의 알림 목록을 조회합니다. (Zoom 신청, 플래너 마감 등)
+> ⚠️ **DEPRECATED**: 이 API는 사용하지 않습니다. Zoom 미팅 알림은 `GET /api/v1/mentee/zoom-meetings`를 사용합니다.
+
+~~멘토의 알림 목록을 조회합니다. (Zoom 신청, 플래너 마감 등)~~
 
 **Endpoint**
 
 ```
-GET /api/v1/mentor/notifications
+GET /api/v1/mentor/notifications (미구현)
 ```
-
-**Query Parameters**
-| 파라미터 | 타입 | 필수 | 설명 |
-|----------|------|------|------|
-| unreadOnly | Boolean | X | 미확인만 조회 (기본값: false) |
-
-**Response**
-
-```json
-{
-  "success": true,
-  "data": {
-    "notifications": [
-      {
-        "id": 1,
-        "type": "ZOOM_REQUEST",
-        "title": "Zoom 미팅 신청",
-        "message": "민유진 — 1/29(수) 20:00",
-        "relatedId": 1,
-        "isRead": false,
-        "createdAt": "2025-01-27T18:30:00",
-        "studentName": "민유진"
-      },
-      {
-        "id": 2,
-        "type": "PLANNER_COMPLETED",
-        "title": "플래너 마감",
-        "message": "민유진 — 1/27(목) 22:15 마감 완료",
-        "relatedId": null,
-        "isRead": true,
-        "createdAt": "2025-01-27T22:15:00",
-        "studentName": "민유진"
-      }
-    ],
-    "unreadCount": 1
-  }
-}
-```
-
-**알림 타입**
-
-- `ZOOM_REQUEST`: Zoom 미팅 신청
-- `PLANNER_COMPLETED`: 플래너 마감
-- `TASK_SUBMITTED`: 과제 제출
 
 ---
 
