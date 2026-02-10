@@ -15,7 +15,7 @@
 | POST | /api/v1/mentee/tasks | 할 일 추가 (멘티) |
 | PATCH | /api/v1/mentee/tasks/{taskId}/study-time | 공부 시간 기록 |
 | POST | /api/v1/mentee/tasks/{taskId}/submission | 과제 제출 |
-| GET | /api/v1/mentee/feedbacks/yesterday | 어제자 피드백 |
+| GET | /api/v1/mentee/feedbacks/yesterday | 어제자 피드백 (Query: date) |
 | GET | /api/v1/mentee/feedbacks | 날짜별 피드백 |
 | GET | /api/v1/mentee/solutions | 약점 맞춤 솔루션 |
 | GET | /api/v1/mentee/monthly-plan | 월간 계획표 |
@@ -40,6 +40,7 @@
 | DELETE | /api/v1/mentor/students/{studentId}/tasks/{taskId} | 할 일 삭제 |
 | PATCH | /api/v1/mentor/students/{studentId}/tasks/{taskId}/confirm | 멘토 확인 |
 | POST | /api/v1/mentor/students/{studentId}/feedbacks | 피드백 작성 |
+| GET | /api/v1/mentor/students/{studentId}/feedbacks/overall | 총평 조회 (Query: date) |
 | PUT | /api/v1/mentor/students/{studentId}/feedbacks/overall | 총평 작성 |
 | PUT | /api/v1/mentor/feedbacks/{feedbackId} | 피드백 수정 |
 | GET | /api/v1/mentor/students/{studentId}/solutions | 솔루션 목록 |

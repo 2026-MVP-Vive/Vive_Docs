@@ -395,6 +395,12 @@ POST /api/v1/mentee/tasks/{taskId}/submission
 GET /api/v1/mentee/feedbacks/yesterday
 ```
 
+**Query Parameters**
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| date | String | X | 기준 날짜 (YYYY-MM-DD, 기본값: 오늘) |
+
 **Response**
 
 ```json
@@ -945,12 +951,14 @@ POST /api/v1/mentee/zoom-meetings
 
 ### 3.19 Zoom 미팅 목록 조회 (멘토용)
 
-**멘토가 담당 멘티들의 Zoom 미팅 신청 내역을 조회합니다.**
+> ⚠️ **DEPRECATED**: 이 API는 사용하지 않습니다. 알림은 `GET /api/v1/mentor/notifications`를 사용합니다.
+
+~~**멘토가 담당 멘티들의 Zoom 미팅 신청 내역을 조회합니다.**~~
 
 **Endpoint**
 
 ```
-GET /api/v1/mentee/zoom-meetings
+GET /api/v1/mentee/zoom-meetings (미사용)
 ```
 
 **Query Parameters**
@@ -1309,7 +1317,53 @@ POST /api/v1/mentor/students/{studentId}/feedbacks
 
 ---
 
-### 4.8 총평 작성/수정
+### 4.8 총평 조회
+
+해당 날짜의 총평이 작성되었는지 확인합니다.
+
+**Endpoint**
+
+```
+GET /api/v1/mentor/students/{studentId}/feedbacks/overall
+```
+
+**Path Parameters**
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| studentId | Long | O | 멘티 ID |
+
+**Query Parameters**
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| date | String | O | 조회 날짜 (YYYY-MM-DD) |
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 50,
+    "date": "2025-01-27",
+    "content": "전체적으로 집중력이 좋았습니다. 국어 문학 부분 조금 더 신경 써주세요.",
+    "hasOverallFeedback": true,
+    "updatedAt": "2025-01-27T22:30:00"
+  }
+}
+```
+
+**Response Fields**
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | Long | 총평 ID |
+| date | String | 날짜 (YYYY-MM-DD) |
+| content | String | 총평 내용 |
+| hasOverallFeedback | Boolean | 총평 작성 여부 |
+| updatedAt | String | 수정 시간 (ISO 8601) |
+
+---
+
+### 4.9 총평 작성/수정
 
 해당 날짜 전체에 대한 총평을 작성합니다.
 
@@ -1346,7 +1400,7 @@ PUT /api/v1/mentor/students/{studentId}/feedbacks/overall
 
 ---
 
-### 4.9 피드백 수정
+### 4.10 피드백 수정
 
 **Endpoint**
 
@@ -1586,17 +1640,58 @@ POST /api/v1/mentor/students/{studentId}/monthly-reports
 
 ---
 
-### 4.15 알림 목록 조회 (미사용)
+### 4.15 알림 목록 조회
 
-> ⚠️ **DEPRECATED**: 이 API는 사용하지 않습니다. Zoom 미팅 알림은 `GET /api/v1/mentee/zoom-meetings`를 사용합니다.
-
-~~멘토의 알림 목록을 조회합니다. (Zoom 신청, 플래너 마감 등)~~
+멘토의 알림 목록을 조회합니다. (Zoom 신청, 플래너 마감 등)
 
 **Endpoint**
 
 ```
-GET /api/v1/mentor/notifications (미구현)
+GET /api/v1/mentor/notifications
 ```
+
+**Query Parameters**
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| unreadOnly | Boolean | X | 미확인만 조회 (기본값: false) |
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "type": "ZOOM_REQUEST",
+        "title": "Zoom 미팅 신청",
+        "message": "민유진 — 1/29(수) 20:00",
+        "relatedId": 1,
+        "isRead": false,
+        "createdAt": "2025-01-27T18:30:00",
+        "studentName": "민유진"
+      },
+      {
+        "id": 2,
+        "type": "PLANNER_COMPLETED",
+        "title": "플래너 마감",
+        "message": "민유진 — 1/27(목) 22:15 마감 완료",
+        "relatedId": null,
+        "isRead": true,
+        "createdAt": "2025-01-27T22:15:00",
+        "studentName": "민유진"
+      }
+    ],
+    "unreadCount": 1
+  }
+}
+```
+
+**알림 타입**
+- `ZOOM_REQUEST`: Zoom 미팅 신청 (relatedId = meetingId)
+- `PLANNER_COMPLETED`: 플래너 마감
+- `TASK_SUBMITTED`: 과제 제출
 
 ---
 
