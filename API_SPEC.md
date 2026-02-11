@@ -49,6 +49,7 @@
 | DELETE | /api/v1/mentor/students/{studentId}/solutions/{solutionId} | 솔루션 삭제 |
 | POST | /api/v1/mentor/students/{studentId}/monthly-reports | 월간 리포트 작성 |
 | GET | /api/v1/mentor/notifications | 알림 목록 조회 |
+| PATCH | /api/v1/mentor/notifications/{notificationId}/read | 알림 읽음 처리 |
 | PATCH | /api/v1/mentor/zoom-meetings/{meetingId}/confirm | Zoom 미팅 확인 |
 
 ### 파일 (File)

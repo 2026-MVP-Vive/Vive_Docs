@@ -397,9 +397,9 @@ GET /api/v1/mentee/feedbacks/yesterday
 
 **Query Parameters**
 
-| 파라미터 | 타입 | 필수 | 설명 |
-|---------|------|------|------|
-| date | String | X | 기준 날짜 (YYYY-MM-DD, 기본값: 오늘) |
+| 파라미터 | 타입   | 필수 | 설명                                 |
+| -------- | ------ | ---- | ------------------------------------ |
+| date     | String | X    | 기준 날짜 (YYYY-MM-DD, 기본값: 오늘) |
 
 **Response**
 
@@ -997,6 +997,7 @@ GET /api/v1/mentee/zoom-meetings (미사용)
 ```
 
 **응답 필드 변경사항**
+
 - `studentName` 필드 추가: 신청한 멘티의 이름
 - 멘토가 호출 시: 담당 멘티들의 Zoom 신청 목록 반환
 - 주로 `status=PENDING`으로 필터링하여 확인 대기 중인 신청만 조회
@@ -1664,13 +1665,17 @@ GET /api/v1/mentor/notifications
     "notifications": [
       {
         "id": 1,
-        "type": "ZOOM_REQUEST",
+        "type": "ZOOM_REQUESTED",
         "title": "Zoom 미팅 신청",
         "message": "민유진 — 1/29(수) 20:00",
         "relatedId": 1,
         "isRead": false,
         "createdAt": "2025-01-27T18:30:00",
-        "studentName": "민유진"
+        "studentName": "민유진",
+        "requestDate": {
+          "date": "2025-01-29",
+          "time": "20:00"
+        }
       },
       {
         "id": 2,
@@ -1689,13 +1694,76 @@ GET /api/v1/mentor/notifications
 ```
 
 **알림 타입**
-- `ZOOM_REQUEST`: Zoom 미팅 신청 (relatedId = meetingId)
+
+- `ZOOM_REQUESTED`: Zoom 미팅 신청 (relatedId = meetingId, requestDate 포함)
 - `PLANNER_COMPLETED`: 플래너 마감
-- `TASK_SUBMITTED`: 과제 제출
+
+**알림 응답 필드 설명**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| id | Number | O | 알림 ID |
+| type | String | O | 알림 타입 |
+| title | String | O | 알림 제목 |
+| message | String | O | 알림 메시지 |
+| relatedId | Number | X | 연관된 ID (Zoom 미팅 ID 등) |
+| isRead | Boolean | O | 읽음 여부 |
+| createdAt | String | O | 생성 시간 (ISO 8601) |
+| studentName | String | O | 학생 이름 |
+| requestDate | Object | X | Zoom 미팅 신청 시에만 포함 (date, time) |
+
+**requestDate 객체 (type이 ZOOM_REQUESTED일 경우)**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| date | String | 희망 날짜 (YYYY-MM-DD) |
+| time | String | 희망 시간 (HH:mm) |
 
 ---
 
-### 4.16 Zoom 미팅 확인
+### 4.16 알림 읽음 처리
+
+알림을 읽음 상태로 변경합니다.
+
+**Endpoint**
+
+```
+PATCH /api/v1/mentor/notifications/{notificationId}/read
+```
+
+**Path Parameters**
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| notificationId | Long | O | 알림 ID |
+
+**Request Body**
+
+없음
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": null,
+  "message": "알림을 읽음 처리했습니다."
+}
+```
+
+**Error Response**
+
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "알림을 찾을 수 없습니다.",
+  "errorCode": "NOTIFICATION_NOT_FOUND"
+}
+```
+
+---
+
+### 4.17 Zoom 미팅 확인
 
 멘티의 Zoom 미팅 신청을 확인합니다.
 
